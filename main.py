@@ -76,96 +76,101 @@ def cords_gen(l):
 
 if __name__ == '__main__':
 
-    host = '192.168.14.96'
-    port = 9009
+    if len(sys.argv) != 3:
+        print('Wrong arguments')
+        sys.exit(1)
+    else:
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        host = sys.argv[1]
+        port = sys.argv[2]
 
-    # connect to remote host
-    try:
-        s.connect((host, port))
-    except:
-        print('Unable to connect')
-        sys.exit()
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    print('Connected to remote host. You can start sending messages')
-    sys.stdout.flush()
+        # connect to remote host
+        try:
+            s.connect((host, port))
+        except:
+            print('Unable to connect')
+            sys.exit()
 
-    scene = Scene(fov=55, flags=pygame.OPENGL | pygame.DOUBLEBUF)
-    scene.move_speed = 0.01
-    scene.shading([10, 3, 2, 1])
+        print('Connected to remote host. You can start sending messages')
+        sys.stdout.flush()
 
-    cubes = loads(s.recv(102400))
-    print('received map info', str(type(cubes)))
+        scene = Scene(fov=55, flags=pygame.OPENGL | pygame.DOUBLEBUF)
+        scene.move_speed = 0.01
+        scene.shading([10, 3, 2, 1])
 
-    objects = [
-        Floor(0, -0.05, 0, 2.5, (0.2, 0.2, 0.2)),
-        cubes
-    ]
+        cubes = loads(s.recv(102400))
+        print('received map info', str(type(cubes)))
 
-    q = Queue()
-    cooldown = 0
-
-    start_new_thread(update, (q,))
-    while scene.loop():
-        # graphics
-        for item in objects:
-            item.draw()
-
-        scene.controls()
-        # wireframe position calculations
-        cooldown += 1
-        coords = tuple(map(lambda x: approx(float(x)), [pos for pos in scene.pos]))
-        coords = [
-            coords[0] - approx(scene.m[2] / 3),
-            coords[1] - approx(scene.m[6] / 3),
-            coords[2] - approx(scene.m[10] / 3)
+        objects = [
+            Floor(0, -0.05, 0, 2.5, (0.2, 0.2, 0.2)),
+            cubes
         ]
 
-        for index, cord in enumerate(coords):
-            if cord == 0:
-                coords[index] = 0
+        q = Queue()
+        cooldown = 0
 
-        WireCube(coords, 0.05).draw()
+        start_new_thread(update, (q,))
+        while scene.loop():
+            # graphics
+            for item in objects:
+                item.draw()
 
-        if scene.debug:
-            pass
+            scene.controls()
+            # wireframe position calculations
+            cooldown += 1
+            coords = tuple(map(lambda x: approx(float(x)), [pos for pos in scene.pos]))
+            coords = [
+                coords[0] - approx(scene.m[2] / 3),
+                coords[1] - approx(scene.m[6] / 3),
+                coords[2] - approx(scene.m[10] / 3)
+            ]
 
-        # get packet from server
+            for index, cord in enumerate(coords):
+                if cord == 0:
+                    coords[index] = 0
 
-        payload = payload_gen(coords)
+            WireCube(coords, 0.05).draw()
 
-        # handle events
-        if scene.mouse[2] and cooldown > 10:
-            cubes.append(Cube(coords, 0.05, (0, 0, 1)))
-            cooldown = 0
-            payload = payload_gen(coords) + '$1'
-            s.sendall(str.encode(payload))
+            if scene.debug:
+                pass
 
-        if scene.mouse[0] and cooldown > 10:
-            cubes.pop(tuple([round(x, 2) for x in coords]))
-            cooldown = 0
-            payload = payload_gen(coords) + '$2'
-            s.sendall(str.encode(payload))
+            # get packet from server
 
-        data = None
-        try:
-            data = q.get(False, 0)
-        except:
-            pass
+            payload = payload_gen(coords)
 
-        if data:
-            info = data.split('$')
-            print(data)
-            if len(info) == 4:
+            # handle events
+            if scene.mouse[2] and cooldown > 10:
+                cubes.append(Cube(coords, 0.05, (0, 0, 1)))
+                cooldown = 0
+                payload = payload_gen(coords) + '$1'
+                s.sendall(str.encode(payload))
 
-                if info[3] == '1':
-                    cubes.append(Cube(cords_gen(info), 0.05, (0, 0, 1)))
-                if info[3] == '2':
-                    print('attempting to remove' + str(cords_gen(info)), str(cubes.pop(cords_gen(info))))
+            if scene.mouse[0] and cooldown > 10:
+                cubes.pop(tuple([round(x, 2) for x in coords]))
+                cooldown = 0
+                payload = payload_gen(coords) + '$2'
+                s.sendall(str.encode(payload))
 
-                payload = payload_gen(coords)
+            data = None
+            try:
+                data = q.get(False, 0)
+            except:
+                pass
 
-        if scene.keys[ord('q')]:
-            s.sendall(str.encode('quit'))
-            break
+            if data:
+                info = data.split('$')
+                print(data)
+                if len(info) == 4:
+
+                    if info[3] == '1':
+                        cubes.append(Cube(cords_gen(info), 0.05, (0, 0, 1)))
+                    if info[3] == '2':
+                        print('attempting to remove' + str(cords_gen(info)), str(cubes.pop(cords_gen(info))))
+
+                    payload = payload_gen(coords)
+
+            if scene.keys[ord('q')]:
+                s.sendall(str.encode('quit'))
+                break

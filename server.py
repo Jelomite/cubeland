@@ -5,12 +5,8 @@ from pickle import dumps, loads
 from cubedict import CubeDict
 from cube import Cube
 
-HOST = '192.168.14.96'
-SOCKET_LIST = []
-RECV_BUFFER = 4096
-PORT = 9009
 
-def server():
+def server(HOST, PORT):
     # the server itself.
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -136,6 +132,11 @@ def modify_map(data_stream, cubes):
 
 if __name__ == "__main__":
     try:
-        sys.exit(server())
+        SOCKET_LIST = []
+        RECV_BUFFER = 4096
+        if len(sys.argv) != 3:
+            print('Wrong arguments')
+            raise KeyboardInterrupt
+        sys.exit(server(sys.argv[1], sys.argv[2]))
     except KeyboardInterrupt:
         print('shutting down')
