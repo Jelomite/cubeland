@@ -5,6 +5,14 @@ from pickle import dumps, loads
 from cubedict import CubeDict
 from cube import Cube
 
+'''
+This is the server, it's used to enable the multiplayer synchronization between all clients.
+It has its own commands for manipulating the map:
+
+clear - reset map (works only when the server is empty)
+load [map_name] - loads the map into the server (works ony when server is empty)
+save [map.name] - saves the map to a file on the local machine, if the file already exists, it'll overwrite the save. 
+'''
 
 def server(HOST, PORT):
     """the server itself."""
