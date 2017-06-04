@@ -10,7 +10,7 @@ from pickle import loads
 
 def approx(n):
     """
-
+    handles the grid layout in the 3d world. converts a coordinate into the nearest grid position.
     :param n: the coordinates of an object .
     :return: the closest coordinates that apply to the world grid. 
     """
@@ -26,6 +26,7 @@ def approx(n):
 
 def update(q):
     """
+    syncs information with the server to ensure full synchronization.
     :param q: the queue that the client uses to communicate with the server
     :return: None
     """
@@ -56,23 +57,26 @@ def update(q):
                 sys.stdout.flush()
 
 
-def payload_gen(coordinations):
+def payload_gen(coordinates):
     """
+    generates a string to send for the server based on the coordinates.
     :param coordinations: the coordinates of an object
     :return: the string that should be sent to server as a payload
     """
-    x = round(float(coordinations[0]), 2)
-    y = round(float(coordinations[1]), 2)
-    z = round(float(coordinations[2]), 2)
+    x = round(float(coordinates[0]), 2)
+    y = round(float(coordinates[1]), 2)
+    z = round(float(coordinates[2]), 2)
     return str(x) + '$' + str(y) + '$' + str(z)
 
 
 def cords_gen(l):
     """
+    the opposite of the payload_gen() function - generates a coordinates from the string received from server.
     :param l: list of strings that the server sent as coordinates
     :return: a universal form of coordinates, a tuple of floats
     """
     return tuple([float(x) for x in l][:-1])
+
 
 if __name__ == '__main__':
 

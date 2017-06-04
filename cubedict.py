@@ -35,7 +35,6 @@ class CubeDict:
         :param cords: the coordinates which we want to remove
         :return: the cube that is popped. if no object in coordinates, return __str__ function
         """
-
         index_str = self.index_gen(cords)
         try:
             return self.dict.pop(index_str)

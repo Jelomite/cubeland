@@ -11,7 +11,6 @@ class Box(object):
     def __init__(self, x, y, z, xi, yi, zi, color):
         """
         initializing function, it runs every time the class is being called.
-        
         :param x: x position
         :param y: y position
         :param z: z position
@@ -32,7 +31,6 @@ class Box(object):
         """
         the OpenGL instructions so the box will be rendered properly.
         this function draws the object on screen.
-        
         :return: 
         """
         vertices = (

@@ -10,7 +10,9 @@ class Scene(object):
     Scene class is in charge of all the GUI and openGL controls.
     it is here to help with rendering and interacting with the user.
     """
-    def __init__(self, w=1920, h=1080, fov=55, fps=60, flags=pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE, debug=False):
+
+    def __init__(self, w=1920, h=1080, fov=55, fps=60, flags=pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE,
+                 debug=False):
         """
         this is the initializing function, it runs when the class is being called.
         :param w: width of window 
@@ -49,6 +51,7 @@ class Scene(object):
 
     def shading(self, pos):
         """
+        handles the shading of the scene using some openGL trickery.
         :param pos: position of the light source.
         :return: 
         """
