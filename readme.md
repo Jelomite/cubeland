@@ -31,7 +31,7 @@ Starting the server:
 
 ```sh
 $ cd cubeland
-$ python server.py [PORT]
+$ python server.py [IP] [PORT]
 ```
 
 Launching the application:
