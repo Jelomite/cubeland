@@ -25,34 +25,38 @@ def server(HOST, PORT):
         while sys.stdin in select([sys.stdin], [], [], 0)[0]:
             command = input().split(' ')
 
-            # simple commands
-            if command[0] == 'load':
-                if len(SOCKET_LIST) < 2:
+            try:
+                # simple commands
+                if command[0] == 'load':
+                    if len(SOCKET_LIST) < 2:
+                        if len(command) > 1:
+                            with open('saves/' + command[1], 'rb') as f:
+                                cubes = loads(f.read())
+                            print('load complete')
+                        else:
+                            print('invalid arguments')
+
+                    else:
+                        print('cannot load map, please try again later')
+                elif command[0] == 'save':
+                    # save map
                     if len(command) > 1:
-                        with open('saves/' + command[1], 'rb') as f:
-                            cubes = loads(f.read())
-                        print('load complete')
+                        with open('saves/' + command[1], 'wb') as f:
+                            f.write(dumps(cubes))
+                        print('save complete')
                     else:
                         print('invalid arguments')
+                elif command[0] == 'clear':
+                    if len(SOCKET_LIST) < 2:
+                        cubes = CubeDict()
+                    else:
+                        print('cannot clear map, please try again later')
 
                 else:
-                    print('cannot load map, please try again later')
-            elif command[0] == 'save':
-                # save map
-                if len(command) > 1:
-                    with open('saves/' + command[1], 'wb') as f:
-                        f.write(dumps(cubes))
-                    print('save complete')
-                else:
-                    print('invalid arguments')
-            elif command[0] == 'clear':
-                if len(SOCKET_LIST) < 2:
-                    cubes = CubeDict()
-                else:
-                    print('cannot clear map, please try again later')
+                    print('unkown command "' + command[0] + '"')
 
-            else:
-                print('unkown command "' + command[0] + '"')
+            except FileNotFoundError:
+                print('ERROR: file not found')
 
         # get the list sockets which are ready to be read through select
         # 4th arg, time_out  = 0 : poll and never block
@@ -137,6 +141,6 @@ if __name__ == "__main__":
         if len(sys.argv) != 3:
             print('Wrong arguments')
             raise KeyboardInterrupt
-        sys.exit(server(sys.argv[1], sys.argv[2]))
+        sys.exit(server(sys.argv[1], int(sys.argv[2])))
     except KeyboardInterrupt:
         print('shutting down')
