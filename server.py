@@ -14,6 +14,7 @@ load [map_name] - loads the map into the server (works ony when server is empty)
 save [map.name] - saves the map to a file on the local machine, if the file already exists, it'll overwrite the save. 
 '''
 
+
 def server(HOST, PORT):
     """the server itself."""
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
