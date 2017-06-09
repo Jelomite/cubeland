@@ -64,7 +64,7 @@ def server(HOST, PORT):
                 else:
                     print('unkown command "' + command[0] + '"')
 
-            except FileNotFoundError:
+            except:
                 print('ERROR: file not found')
 
         # get the list sockets which are ready to be read through select
